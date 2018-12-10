@@ -1,1 +1,132 @@
 # k8s_training
+
+# install docker-ce on debian
+```
+apt-get update
+apt-get install -y \
+     apt-transport-https \
+     ca-certificates \
+     curl \
+     gnupg2 \
+     software-properties-common
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) \
+   stable"
+apt-get update
+apt-get install -y docker-ce=17.03.3~ce-0~debian-stretch
+```
+To get all available versions
+`apt-cache madison docker-ce`
+
+# Helm installation
+###### Install helm client
+`curl https://storage.googleapis.com/kubernetes-helm/helm-v2.12.0-rc.2-linux-amd64.tar.gz | tar zxv`
+
+###### Add cluster-admin to tiller
+`kubectl edit clusterrolebindings cluster-admin`  
+
+and then add the following line to the end.
+```
+- kind: ServiceAccount
+  name: default
+  namespace: kube-system
+```
+
+
+# Deploy nginx-ingress
+Let's install ingress service with nginx using helm.
+`helm install stable/nginx-ingress --name k8s-train --set rbac.create=true --namespace kube-system --set controller.kind=DaemonSet,controller.hostNetwork=true`
+
+
+# Deploy StorageOS
+###### git clone the repository
+`git clone https://github.com/storageos/deploy.git`
+###### Deploy operator
+```
+cd deploy/k8s/deploy-storageos/cluster-operator
+./deploy-operator.sh
+kubectl label nodes <worker node> node-role.kubernetes.io/worker=true
+kubectl create -f examples/basic.yaml
+```
+###### Persistent Volume
+```
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: fast
+```
+###### Mount the persistent volume
+```
+kind: Pod
+apiVersion: v1
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: myfrontend
+    image: nginx
+    volumeMounts:
+    - mountPath: "/var/www/html"
+      name: mypd
+  volumes:
+  - name: mypd
+    persistentVolumeClaim:
+      claimName: myclaim
+  nodeSelector:
+    node-role.kubernetes.io/worker: "true"
+```
+
+###### Deploy MySQl StatefulSet with persistent volume
+```
+cd ../../examples
+kubectl create -f ./mysql
+```
+
+###### Deploy jenkins with helm
+```
+helm install stable/jenkins --set rbac.install=true,Persistence.StorageClass=fast,Master.ServiceType=ClusterIP,Master.HostName=<Public URL>
+```
+
+Jenkins admin password to access the UI. 
+`printf $(kubectl get secret --namespace default hardy-aardwolf-jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode);echo`
+
+Sample job definition
+```
+def label = "slave-${UUID.randomUUID().toString()}"
+podTemplate(label: label, containers: [
+    containerTemplate(name: 'golang', image: 'golang:1.10.5-alpine3.7', ttyEnabled: true, command: 'cat')
+  ]) {
+
+    node(label) {
+        stage('Test Stage') {
+            container('golang') {
+                stage('Go version') {
+                    sh 'go version'
+                }
+            }
+        }
+    }    
+}
+```
+
+# Other tools
+- **helm**
+  - Application manager for Kubernetes. 
+- **StorageOS**
+  - Persistent volume provisionor for containers. 
+- **Kaniko**
+  - a tool to build container images from a Dockerfile, inside a container or Kubernetes cluster.
+- **cert-manager**
+  - Kubernetes add-on to automate the management and issuance of TLS certificates from various issuing sources.
+- **traefik**
+  - Another ingress service. 
+ 

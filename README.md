@@ -36,7 +36,7 @@ and then add the following line to the end.
 
 
 # Deploy nginx-ingress
-Let's install ingress service with nginx using helm.
+Let's install ingress service with nginx using helm.  
 `helm install stable/nginx-ingress --name k8s-train --set rbac.create=true --namespace kube-system --set controller.kind=DaemonSet,controller.hostNetwork=true`
 
 
@@ -96,7 +96,7 @@ kubectl create -f ./mysql
 helm install stable/jenkins --set rbac.install=true,Persistence.StorageClass=fast,Master.ServiceType=ClusterIP,Master.HostName=<Public URL>
 ```
 
-Jenkins admin password to access the UI. 
+Jenkins admin password to access the UI.  
 `printf $(kubectl get secret --namespace default hardy-aardwolf-jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode);echo`
 
 Sample job definition

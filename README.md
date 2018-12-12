@@ -216,6 +216,15 @@ spec:
   - a tool to build container images from a Dockerfile, inside a container or Kubernetes cluster.
 - **cert-manager**
   - Kubernetes add-on to automate the management and issuance of TLS certificates from various issuing sources.
-- **traefik**
-  - Another ingress service. 
+- **Ingress**
+  - nginx
+  - traefik
+- **weaveworks**
+  - sock-shop
+  - weave-net
+  - weave scope
+- **Istio**
+- **Linkerd**
+- **Prometheus**
+- **InfluxDB**
  

@@ -48,6 +48,20 @@ Let's install ingress service with nginx using helm.
 cd deploy/k8s/deploy-storageos/cluster-operator
 ./deploy-operator.sh
 kubectl label nodes <worker node> node-role.kubernetes.io/worker=true
+kubectl create -f - <<END
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "storageos-api"
+  namespace: "default"
+  labels:
+    app: "storageos"
+type: "kubernetes.io/storageos"
+data:
+  # echo -n '<secret>' | base64
+  apiUsername: c3RvcmFnZW9z
+  apiPassword: c3RvcmFnZW9z
+END
 kubectl create -f examples/basic.yaml
 ```
 ###### Persistent Volume

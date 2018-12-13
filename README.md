@@ -91,7 +91,7 @@ cd ../../examples
 kubectl create -f ./mysql
 ```
 
-###### Deploy jenkins with helm
+### Deploy jenkins with helm
 `helm install stable/jenkins --set rbac.install=true,Persistence.StorageClass=fast,Master.ServiceType=ClusterIP,Master.HostName=<Public URL>`
 
 Jenkins admin password to access the UI.  

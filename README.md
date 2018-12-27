@@ -1,25 +1,5 @@
 # k8s_training
 
-# install docker-ce on debian
-```
-apt-get update
-apt-get install -y \
-     apt-transport-https \
-     ca-certificates \
-     curl \
-     gnupg2 \
-     software-properties-common
-curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/debian \
-   $(lsb_release -cs) \
-   stable"
-apt-get update
-apt-get install -y docker-ce=17.03.3~ce-0~debian-stretch
-```
-To get all available versions
-`apt-cache madison docker-ce`
-
 # Helm installation
 ###### Install helm client
 `curl https://storage.googleapis.com/kubernetes-helm/helm-v2.12.0-rc.2-linux-amd64.tar.gz | tar zxv`

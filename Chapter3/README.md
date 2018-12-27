@@ -1,4 +1,12 @@
 # Installation
+## キーノート
+- kubelet
+- kubeadm
+- kubectl
+- マスターノード
+- ワーカーノード
+- taint(Chapter11で解説)
+
 ## 1. docker-ceのインストール
 ```
 apt-get update
@@ -16,7 +24,7 @@ add-apt-repository \
 apt-get update
 apt-get install -y docker-ce=17.03.3~ce-0~debian-stretch
 ```
-To get all available versions
+インストール可能な全てのバージョンを確認するには下記のコマンドを実行します。
 > `apt-cache madison docker-ce`
 
 dockerのインストール・起動確認
@@ -74,11 +82,19 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 > `kubectl get nodes`
 
 マスターノードにtaint(Chapter11で解説)が設定されていますので削除します。
-> `kubectl taint nodes --all node-role.kubernetes.io/master-`
+まずは確認。
+> `kubectl describe node | grep Taint`  
 
-ワーカーノードで`not found`と出ますが想定内ですので無視してください。
+taintを削除。
+> `kubectl taint nodes --all node-role.kubernetes.io/master-`  
+
+削除された事を確認
+> `kubectl describe node | grep Taint`
+
+ワーカーノードで`not found`と出ますがワーカーノードには`taint`が設定されていない為、`not found`と出力されますが無視してください。
 
 kubectlの補完機能を使用するため下記のコマンドを実行しておきましょう。
-> `. <(kubectl completion bash) && echo '. <(kubectl completion bash)' >> ~/.bashrc`
+> `source <(kubectl completion bash) && echo 'source <(kubectl completion bash)' >> ~/.bashrc`
+ 
 コマンドを途中まで実行し、`tab`を押すと残りが補完されるはずです。
 
